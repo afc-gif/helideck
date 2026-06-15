@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 
 /**
  * Inspection Controller
- * 
+ *
  * Handles sync, retrieval, and management of inspections
  * Supports offline-first PWA with conflict resolution
  */
@@ -18,13 +18,13 @@ class InspectionController extends Controller
 {
     /**
      * Sync Inspections
-     * 
+     *
      * POST /api/inspections/sync
-     * 
+     *
      * Accepts array of inspections from offline queue
      * Resolves conflicts using updated_at timestamp
      * Idempotent - same payload can be resent safely
-     * 
+     *
      * Request body:
      * [
      *   {
@@ -35,7 +35,7 @@ class InspectionController extends Controller
      *     "updated_at": "2026-02-11T10:30:00Z"
      *   }
      * ]
-     * 
+     *
      * Response (200):
      * [
      *   {
@@ -82,7 +82,7 @@ class InspectionController extends Controller
 
     /**
      * Sync single inspection - handles conflict resolution
-     * 
+     *
      * Returns: {uuid, status: synced|skipped|failed, id, reason}
      */
     /**
@@ -175,7 +175,7 @@ class InspectionController extends Controller
 
     /**
      * Get all inspections for authenticated inspector
-     * 
+     *
      * GET /api/inspections
      * Query params:
      *   - page: pagination (default 1)
@@ -183,7 +183,7 @@ class InspectionController extends Controller
      *   - status: filter by status (draft|submitted|reviewed|approved)
      *   - from_date: filter by created date (YYYY-MM-DD)
      *   - to_date: filter by created date (YYYY-MM-DD)
-     * 
+     *
      * Response (200):
      * {
      *   "data": [
@@ -253,9 +253,9 @@ class InspectionController extends Controller
 
     /**
      * Get single inspection by UUID
-     * 
+     *
      * GET /api/inspections/{uuid}
-     * 
+     *
      * Response (200):
      * {
      *   "id": 1,
@@ -282,9 +282,9 @@ class InspectionController extends Controller
 
     /**
      * Export inspection as PDF
-     * 
+     *
      * GET /api/inspections/{uuid}/export/pdf
-     * 
+     *
      * Returns PDF file
      */
     public function exportPdf(Request $request, string $uuid)
@@ -307,9 +307,9 @@ class InspectionController extends Controller
 
     /**
      * Export all inspections as CSV
-     * 
+     *
      * GET /api/inspections/export/csv
-     * 
+     *
      * Returns CSV file
      */
     public function exportCsv(Request $request)
