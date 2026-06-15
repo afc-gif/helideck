@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('password');
             $table->enum('role', ['admin', 'inspector'])->default('inspector');
             $table->timestamps();
-            
+
             // Index for role-based queries
             $table->index('role');
         });

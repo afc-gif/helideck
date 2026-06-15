@@ -17,26 +17,26 @@ return new class extends Migration
 
         Schema::create('inspections', function (Blueprint $table) {
             $table->id();
-            
+
             // UUID for client-side offline sync reference
             $table->uuid('uuid')->unique();
-            
+
             // Foreign key to inspector
             $table->foreignId('inspector_id')->constrained('users')->onDelete('cascade');
-            
+
             // JSON storage for all form data
             // Matches the formSchema structure from frontend
             $table->json('form_data');
-            
+
             // Sync status tracking
             $table->enum('status', ['draft', 'submitted', 'reviewed', 'approved'])->default('draft');
-            
+
             // Track last successful sync
             $table->timestamp('synced_at')->nullable();
-            
+
             // Timestamps
             $table->timestamps();
-            
+
             // Indexes for efficient queries
             $table->index('inspector_id');
             $table->index('status');
