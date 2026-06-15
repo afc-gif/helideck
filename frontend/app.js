@@ -8,9 +8,16 @@ const FORM_VERSION = "rev15-2023-02-10";
 function checkAuth() {
   const token = localStorage.getItem('auth_token');
   if (!token) {
-    window.location.href = '/login.html';
+    window.location.replace('/login.html');
     return false;
   }
+
+  const user = getCurrentUser();
+  if (user?.role === 'admin') {
+    window.location.replace('/admin.html');
+    return false;
+  }
+
   return true;
 }
 
@@ -27,9 +34,23 @@ function getCurrentUser() {
 
 // Logout handler
 function logout() {
+  const token = getAuthToken();
+
   localStorage.removeItem('auth_token');
   localStorage.removeItem('auth_user');
-  window.location.href = '/login.html';
+
+  if (token && token !== 'demo-token') {
+    fetch(`${API_BASE}/logout`, {
+      method: 'POST',
+      keepalive: true,
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    }).catch(() => {});
+  }
+
+  window.location.replace('/login.html');
 }
 
 // API call with auth

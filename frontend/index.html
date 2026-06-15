@@ -16,7 +16,7 @@
     <div class="status">
       <span id="netStatus" class="pill">Offline</span>
       <span id="syncStatus" class="pill">Idle</span>
-      <button type="button" id="logoutBtn" style="
+      <button type="button" id="logoutBtn" onclick="localStorage.removeItem('auth_token'); localStorage.removeItem('auth_user'); window.location.replace('/login.html');" style="
         background: rgba(255, 255, 255, 0.18);
         color: #f8f7f2;
         border: 1px solid rgba(255, 255, 255, 0.1);
