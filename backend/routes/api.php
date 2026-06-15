@@ -1,4 +1,5 @@
-<?php
+
+|
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InspectionController;
@@ -24,7 +25,7 @@ Route::post('/register', [AuthController::class, 'register'])->name('register');
  */
 
 Route::middleware('auth:sanctum')->group(function () {
-    
+
     /**
      * Authentication
      */
