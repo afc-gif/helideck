@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Inspection;
 use App\Models\SyncLog;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -84,7 +85,14 @@ class InspectionController extends Controller
      * 
      * Returns: {uuid, status: synced|skipped|failed, id, reason}
      */
-    private function syncSingleInspection($inspector, $payload)
+    /**
+     * Sync single inspection - handles conflict resolution
+     *
+     * @param  User  $inspector
+     * @param  array $payload
+     * @return array
+     */
+    private function syncSingleInspection(User $inspector, array $payload): array
     {
         $uuid = $payload['uuid'];
         $incomingUpdatedAt = \Carbon\Carbon::parse($payload['updated_at']);
@@ -240,7 +248,7 @@ class InspectionController extends Controller
      *   "updated_at": "2026-02-11T10:30:00Z"
      * }
      */
-    public function show(Request $request, $uuid)
+    public function show(Request $request, string $uuid)
     {
         $inspector = $request->user();
         $inspection = Inspection::where('uuid', $uuid)
@@ -257,7 +265,7 @@ class InspectionController extends Controller
      * 
      * Returns PDF file
      */
-    public function exportPdf(Request $request, $uuid)
+    public function exportPdf(Request $request, string $uuid)
     {
         $inspector = $request->user();
         $inspection = Inspection::where('uuid', $uuid)
