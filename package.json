@@ -1,0 +1,12 @@
+{
+  "name": "helideck-inspection-report",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Offline-first helideck inspection reporting PWA.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

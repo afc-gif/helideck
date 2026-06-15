@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Helideck Inspection Report - Offline</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-title">Bristow Helicopters Nigeria Ltd.</div>
+      <div class="brand-sub">Helideck Inspection Report - Rivers Conquest 20</div>
+    </div>
+    <div class="status">
+      <span id="netStatus" class="pill">Offline</span>
+      <span id="syncStatus" class="pill">Idle</span>
+      <button type="button" id="logoutBtn" style="
+        background: rgba(255, 255, 255, 0.18);
+        color: #f8f7f2;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+      ">Logout</button>
+    </div>
+  </header>
+
+  <main class="app">
+    <section class="card" id="draftsCard">
+      <h2>Local Drafts</h2>
+      <div class="actions">
+        <button type="button" id="newReportBtn">New Inspection</button>
+        <button type="button" id="syncNowBtn" class="secondary">Sync Now</button>
+      </div>
+      <div id="draftList" class="list"></div>
+    </section>
+
+    <section class="card" id="reportCard">
+      <h2>Rivers Conquest 20 Helideck Report</h2>
+      <p class="muted">HDIR Rev 15 (10 FEB 2023). All fields mirror the PDF form. Required fields are marked.</p>
+      <form id="inspectionForm"></form>
+      <div class="actions">
+        <button type="button" id="saveDraftBtn" class="secondary">Save Draft</button>
+        <button type="button" id="submitBtn">Submit</button>
+      </div>
+      <div id="formMessage" class="muted"></div>
+    </section>
+  </main>
+
+  <template id="sectionTemplate">
+    <section class="form-section">
+      <h3 class="section-title"></h3>
+      <div class="section-body"></div>
+    </section>
+  </template>
+
+  <template id="fieldTemplate">
+    <label class="field">
+      <span class="field-label"></span>
+      <span class="field-input"></span>
+    </label>
+  </template>
+
+  <template id="checkTemplate">
+    <div class="check-row">
+      <div class="check-label"></div>
+      <div class="check-controls"></div>
+    </div>
+  </template>
+
+  <script src="idb.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
