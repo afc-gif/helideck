@@ -126,6 +126,7 @@ class InspectionController extends Controller
             $existing->update([
                 'form_data' => $payload['form_data'],
                 'status' => $payload['status'],
+                'synced_at' => now(),
                 'updated_at' => $incomingUpdatedAt,
             ]);
 
@@ -151,6 +152,7 @@ class InspectionController extends Controller
             'inspector_id' => $inspector->id,
             'form_data' => $payload['form_data'],
             'status' => $payload['status'],
+            'synced_at' => now(),
             'created_at' => \Carbon\Carbon::parse($payload['created_at']),
             'updated_at' => $incomingUpdatedAt,
         ]);
@@ -203,7 +205,11 @@ class InspectionController extends Controller
     public function index(Request $request)
     {
         $inspector = $request->user();
-        $query = Inspection::where('inspector_id', $inspector->id);
+        $query = Inspection::query()->with('inspector');
+
+        if ($inspector->role !== 'admin') {
+            $query->where('inspector_id', $inspector->id);
+        }
 
         // Filter by status
         if ($request->has('status')) {
@@ -216,6 +222,18 @@ class InspectionController extends Controller
         }
         if ($request->has('to_date')) {
             $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($query) use ($search) {
+                $query->where('uuid', 'like', "%{$search}%")
+                    ->orWhereHas('inspector', function ($query) use ($search) {
+                        $query->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    })
+                    ->orWhereRaw("form_data::text ilike ?", ["%{$search}%"]);
+            });
         }
 
         // Paginate
@@ -251,9 +269,13 @@ class InspectionController extends Controller
     public function show(Request $request, string $uuid)
     {
         $inspector = $request->user();
-        $inspection = Inspection::where('uuid', $uuid)
-            ->where('inspector_id', $inspector->id)
-            ->firstOrFail();
+        $query = Inspection::where('uuid', $uuid)->with('inspector');
+
+        if ($inspector->role !== 'admin') {
+            $query->where('inspector_id', $inspector->id);
+        }
+
+        $inspection = $query->firstOrFail();
 
         return response()->json($inspection, 200);
     }
@@ -268,9 +290,13 @@ class InspectionController extends Controller
     public function exportPdf(Request $request, string $uuid)
     {
         $inspector = $request->user();
-        $inspection = Inspection::where('uuid', $uuid)
-            ->where('inspector_id', $inspector->id)
-            ->firstOrFail();
+        $query = Inspection::where('uuid', $uuid);
+
+        if ($inspector->role !== 'admin') {
+            $query->where('inspector_id', $inspector->id);
+        }
+
+        $inspection = $query->firstOrFail();
 
         // DomPDF will be implemented in export service
         return response()->json([
@@ -289,9 +315,13 @@ class InspectionController extends Controller
     public function exportCsv(Request $request)
     {
         $inspector = $request->user();
-        $inspections = Inspection::where('inspector_id', $inspector->id)
-            ->latest('created_at')
-            ->get();
+        $query = Inspection::query()->with('inspector');
+
+        if ($inspector->role !== 'admin') {
+            $query->where('inspector_id', $inspector->id);
+        }
+
+        $inspections = $query->latest('created_at')->get();
 
         $headers = [
             'Content-Type' => 'text/csv',
@@ -305,6 +335,7 @@ class InspectionController extends Controller
                 'UUID',
                 'Status',
                 'Landing Site',
+                'Inspector',
                 'Created Date',
                 'Updated Date',
             ]);
@@ -315,6 +346,7 @@ class InspectionController extends Controller
                     $inspection->uuid,
                     $inspection->status,
                     $inspection->getLandingSiteName(),
+                    $inspection->inspector?->email,
                     $inspection->created_at->format('Y-m-d H:i:s'),
                     $inspection->updated_at->format('Y-m-d H:i:s'),
                 ]);

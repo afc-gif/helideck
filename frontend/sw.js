@@ -1,6 +1,8 @@
-const CACHE_NAME = "helideck-cache-v2";
+const CACHE_NAME = "helideck-cache-v3";
 const ASSETS = [
   "./index.html",
+  "./login.html",
+  "./admin.html",
   "./styles.css",
   "./app.js",
   "./idb.js",

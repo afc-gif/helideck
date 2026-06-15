@@ -40,6 +40,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // List inspections with pagination and filtering
     Route::get('/inspections', [InspectionController::class, 'index'])->name('inspections.index');
 
+    // Export all inspections as CSV
+    Route::get('/inspections/export/csv', [InspectionController::class, 'exportCsv'])->name('inspections.export.csv');
+
     // Get single inspection by UUID
     Route::get('/inspections/{uuid}', [InspectionController::class, 'show'])->name('inspections.show');
 
@@ -48,7 +51,4 @@ Route::middleware('auth:sanctum')->group(function () {
      */
     // Export single inspection as PDF
     Route::get('/inspections/{uuid}/export/pdf', [InspectionController::class, 'exportPdf'])->name('inspections.export.pdf');
-
-    // Export all inspections as CSV
-    Route::get('/inspections/export/csv', [InspectionController::class, 'exportCsv'])->name('inspections.export.csv');
 });

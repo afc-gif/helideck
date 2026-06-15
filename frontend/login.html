@@ -432,9 +432,11 @@
 
         showMessage('Login successful! Redirecting...', 'success');
 
-        // Redirect to form
+        const redirectTo = data.user?.role === 'admin' ? '/admin.html' : '/index.html';
+
+        // Redirect to the right workspace for the signed-in role
         setTimeout(() => {
-          window.location.href = '/index.html';
+          window.location.href = redirectTo;
         }, 1000);
       } catch (error) {
         showMessage(`${error.message}. Inspector: inspector@example.com / InspectorPass123!. Admin: admin@example.com / AdminPass123!.`, 'error');

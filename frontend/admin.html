@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Dashboard - Helideck Inspections</title>
+  <style>
+    :root {
+      --bg: #f6f5f2;
+      --panel: #ffffff;
+      --ink: #1a1f2c;
+      --muted: #5b6270;
+      --accent: #1c6f6b;
+      --gold: #c6922e;
+      --border: #e3e2dd;
+      --danger: #b12b2b;
+      --ok: #1b7f3a;
+      --warn: #b67d00;
+      --shadow: 0 10px 30px rgba(20, 20, 20, 0.08);
+      font-family: "Source Sans 3", "Segoe UI", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background: var(--bg);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px clamp(16px, 4vw, 32px);
+      color: #f8f7f2;
+      background: #15302e;
+      border-bottom: 4px solid var(--gold);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(1.1rem, 2vw, 1.45rem);
+      letter-spacing: 0;
+    }
+
+    .brand p {
+      margin: 4px 0 0;
+      color: rgba(248, 247, 242, 0.78);
+      font-size: 0.9rem;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .user-pill {
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 8px 10px;
+      border-radius: 8px;
+      color: rgba(248, 247, 242, 0.9);
+      font-size: 0.85rem;
+    }
+
+    main {
+      width: min(1280px, 100%);
+      margin: 0 auto;
+      padding: clamp(16px, 4vw, 32px);
+      display: grid;
+      gap: 18px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stat {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .stat strong {
+      display: block;
+      margin-top: 8px;
+      color: var(--accent);
+      font-size: 1.8rem;
+      line-height: 1;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: minmax(180px, 1.5fr) minmax(140px, 0.8fr) minmax(140px, 0.8fr) minmax(140px, 0.8fr) auto auto;
+      gap: 10px;
+      padding: 14px;
+      align-items: end;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    input,
+    select {
+      width: 100%;
+      height: 40px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0 10px;
+      color: var(--ink);
+      background: #fcfcfb;
+      font: inherit;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    button {
+      height: 40px;
+      border: 0;
+      border-radius: 8px;
+      padding: 0 14px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    button.secondary {
+      background: #eeece5;
+      color: var(--ink);
+      border: 1px solid var(--border);
+    }
+
+    button.danger {
+      background: var(--danger);
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: wait;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 920px;
+    }
+
+    th,
+    td {
+      padding: 12px 14px;
+      border-top: 1px solid var(--border);
+      text-align: left;
+      vertical-align: middle;
+      font-size: 0.92rem;
+    }
+
+    th {
+      color: var(--muted);
+      background: #f2f0ea;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .site {
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .uuid {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-width: 82px;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: capitalize;
+    }
+
+    .badge.draft {
+      background: #eeece5;
+      color: #4f5561;
+    }
+
+    .badge.submitted {
+      background: #e5f0f7;
+      color: #17607c;
+    }
+
+    .badge.reviewed {
+      background: #fff3d6;
+      color: #8a5f00;
+    }
+
+    .badge.approved {
+      background: #e5f5eb;
+      color: var(--ok);
+    }
+
+    .empty,
+    .message {
+      padding: 28px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .message.error {
+      color: var(--danger);
+    }
+
+    dialog {
+      width: min(900px, calc(100vw - 24px));
+      max-height: calc(100vh - 24px);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+    }
+
+    dialog::backdrop {
+      background: rgba(10, 16, 20, 0.5);
+    }
+
+    .dialog-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dialog-head h2 {
+      margin: 0;
+      font-size: 1.15rem;
+    }
+
+    .dialog-body {
+      padding: 18px;
+      overflow: auto;
+      max-height: calc(100vh - 150px);
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .detail-field {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fbfaf7;
+    }
+
+    .detail-field span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 5px;
+    }
+
+    .detail-section {
+      margin-top: 18px;
+    }
+
+    .detail-section h3 {
+      margin: 0 0 10px;
+      color: var(--accent);
+      font-size: 1rem;
+    }
+
+    @media (max-width: 860px) {
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .top-actions {
+        justify-content: flex-start;
+      }
+
+      .stats,
+      .filters,
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <h1>Helideck Inspections</h1>
+      <p>Admin dashboard</p>
+    </div>
+    <div class="top-actions">
+      <span id="adminUser" class="user-pill">Loading...</span>
+      <button id="exportBtn" type="button" class="secondary">Export CSV</button>
+      <button id="logoutBtn" type="button" class="danger">Logout</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="stats" aria-label="Inspection summary">
+      <div class="stat"><span>Total</span><strong id="totalCount">0</strong></div>
+      <div class="stat"><span>Submitted</span><strong id="submittedCount">0</strong></div>
+      <div class="stat"><span>Reviewed</span><strong id="reviewedCount">0</strong></div>
+      <div class="stat"><span>Approved</span><strong id="approvedCount">0</strong></div>
+    </section>
+
+    <section class="panel">
+      <form id="filterForm" class="filters">
+        <label>
+          Search
+          <input id="searchInput" type="search" placeholder="Landing site, inspector, UUID" />
+        </label>
+        <label>
+          Status
+          <select id="statusInput">
+            <option value="">All</option>
+            <option value="draft">Draft</option>
+            <option value="submitted">Submitted</option>
+            <option value="reviewed">Reviewed</option>
+            <option value="approved">Approved</option>
+          </select>
+        </label>
+        <label>
+          From
+          <input id="fromInput" type="date" />
+        </label>
+        <label>
+          To
+          <input id="toInput" type="date" />
+        </label>
+        <button id="filterBtn" type="submit">Apply</button>
+        <button id="clearBtn" type="button" class="secondary">Clear</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <div id="message" class="message">Loading inspections...</div>
+      <div class="table-wrap">
+        <table id="inspectionTable" hidden>
+          <thead>
+            <tr>
+              <th>Landing Site</th>
+              <th>Inspector</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Updated</th>
+              <th>Synced</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="inspectionRows"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="detailDialog">
+    <div class="dialog-head">
+      <div>
+        <h2 id="detailTitle">Inspection</h2>
+        <div id="detailMeta" class="uuid"></div>
+      </div>
+      <button id="closeDialogBtn" type="button" class="secondary">Close</button>
+    </div>
+    <div id="detailBody" class="dialog-body"></div>
+  </dialog>
+
+  <script>
+    const API_BASE = 'https://helideck-production.up.railway.app/api';
+    const token = localStorage.getItem('auth_token');
+    const authUser = JSON.parse(localStorage.getItem('auth_user') || 'null');
+
+    const adminUser = document.getElementById('adminUser');
+    const message = document.getElementById('message');
+    const table = document.getElementById('inspectionTable');
+    const rows = document.getElementById('inspectionRows');
+    const filterForm = document.getElementById('filterForm');
+    const searchInput = document.getElementById('searchInput');
+    const statusInput = document.getElementById('statusInput');
+    const fromInput = document.getElementById('fromInput');
+    const toInput = document.getElementById('toInput');
+    const exportBtn = document.getElementById('exportBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const detailDialog = document.getElementById('detailDialog');
+    const detailTitle = document.getElementById('detailTitle');
+    const detailMeta = document.getElementById('detailMeta');
+    const detailBody = document.getElementById('detailBody');
+    const closeDialogBtn = document.getElementById('closeDialogBtn');
+
+    function logout() {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('auth_user');
+      window.location.href = '/login.html';
+    }
+
+    if (!token || !authUser || authUser.role !== 'admin') {
+      logout();
+    }
+
+    adminUser.textContent = authUser.email;
+
+    async function api(endpoint, options = {}) {
+      const response = await fetch(`${API_BASE}${endpoint}`, {
+        ...options,
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          ...(options.headers || {})
+        }
+      });
+
+      if (response.status === 401) {
+        logout();
+        return null;
+      }
+
+      return response;
+    }
+
+    function formatDate(value) {
+      if (!value) return '-';
+      return new Intl.DateTimeFormat(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(new Date(value));
+    }
+
+    function landingSite(inspection) {
+      return inspection.form_data?.cover?.landing_site_name || 'Unknown';
+    }
+
+    function setMessage(text, isError = false) {
+      message.textContent = text;
+      message.className = `message${isError ? ' error' : ''}`;
+      message.hidden = false;
+      table.hidden = true;
+    }
+
+    function updateStats(inspections, total) {
+      document.getElementById('totalCount').textContent = total ?? inspections.length;
+      document.getElementById('submittedCount').textContent = inspections.filter((item) => item.status === 'submitted').length;
+      document.getElementById('reviewedCount').textContent = inspections.filter((item) => item.status === 'reviewed').length;
+      document.getElementById('approvedCount').textContent = inspections.filter((item) => item.status === 'approved').length;
+    }
+
+    function renderRows(inspections) {
+      rows.innerHTML = '';
+
+      inspections.forEach((inspection) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <span class="site"></span>
+            <span class="uuid"></span>
+          </td>
+          <td></td>
+          <td><span class="badge"></span></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td><button type="button" class="secondary">View</button></td>
+        `;
+
+        tr.querySelector('.site').textContent = landingSite(inspection);
+        tr.querySelector('.uuid').textContent = inspection.uuid;
+        tr.children[1].textContent = inspection.inspector?.email || 'Unknown';
+        const badge = tr.querySelector('.badge');
+        badge.textContent = inspection.status;
+        badge.classList.add(inspection.status);
+        tr.children[3].textContent = formatDate(inspection.created_at);
+        tr.children[4].textContent = formatDate(inspection.updated_at);
+        tr.children[5].textContent = inspection.synced_at ? formatDate(inspection.synced_at) : 'Pending';
+        tr.querySelector('button').addEventListener('click', () => openInspection(inspection.uuid));
+        rows.appendChild(tr);
+      });
+    }
+
+    function buildQuery() {
+      const params = new URLSearchParams({ per_page: '100' });
+      if (searchInput.value.trim()) params.set('search', searchInput.value.trim());
+      if (statusInput.value) params.set('status', statusInput.value);
+      if (fromInput.value) params.set('from_date', fromInput.value);
+      if (toInput.value) params.set('to_date', toInput.value);
+      return params.toString();
+    }
+
+    async function loadInspections() {
+      setMessage('Loading inspections...');
+
+      try {
+        const response = await api(`/inspections?${buildQuery()}`);
+        if (!response) return;
+
+        const payload = await response.json();
+        if (!response.ok) {
+          throw new Error(payload.message || 'Unable to load inspections');
+        }
+
+        const inspections = payload.data || [];
+        updateStats(inspections, payload.meta?.total);
+
+        if (!inspections.length) {
+          setMessage('No inspections found.');
+          return;
+        }
+
+        renderRows(inspections);
+        message.hidden = true;
+        table.hidden = false;
+      } catch (error) {
+        setMessage(error.message, true);
+      }
+    }
+
+    function flattenData(data) {
+      const sections = [];
+
+      Object.entries(data || {}).forEach(([sectionName, sectionData]) => {
+        if (!sectionData || typeof sectionData !== 'object' || Array.isArray(sectionData)) return;
+
+        const fields = Object.entries(sectionData)
+          .filter(([, value]) => value !== null && value !== undefined && value !== '')
+          .filter(([, value]) => typeof value !== 'object');
+
+        if (fields.length) {
+          sections.push([sectionName, fields]);
+        }
+      });
+
+      return sections;
+    }
+
+    async function openInspection(uuid) {
+      detailTitle.textContent = 'Loading...';
+      detailMeta.textContent = uuid;
+      detailBody.innerHTML = '';
+      detailDialog.showModal();
+
+      try {
+        const response = await api(`/inspections/${uuid}`);
+        if (!response) return;
+
+        const inspection = await response.json();
+        if (!response.ok) {
+          throw new Error(inspection.message || 'Unable to load inspection');
+        }
+
+        detailTitle.textContent = landingSite(inspection);
+        detailMeta.textContent = `${inspection.uuid} | ${inspection.inspector?.email || 'Unknown inspector'} | ${inspection.status}`;
+
+        const sections = flattenData(inspection.form_data);
+        detailBody.innerHTML = sections.map(([sectionName, fields]) => `
+          <section class="detail-section">
+            <h3>${escapeHtml(titleize(sectionName))}</h3>
+            <div class="detail-grid">
+              ${fields.map(([key, value]) => `
+                <div class="detail-field">
+                  <span>${escapeHtml(titleize(key))}</span>
+                  <div>${escapeHtml(String(value))}</div>
+                </div>
+              `).join('')}
+            </div>
+          </section>
+        `).join('') || '<div class="empty">No form data available.</div>';
+      } catch (error) {
+        detailBody.innerHTML = `<div class="message error">${escapeHtml(error.message)}</div>`;
+      }
+    }
+
+    function titleize(value) {
+      return String(value).replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+    }
+
+    function escapeHtml(value) {
+      return value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    async function exportCsv() {
+      exportBtn.disabled = true;
+
+      try {
+        const response = await api('/inspections/export/csv');
+        if (!response) return;
+        if (!response.ok) {
+          const payload = await response.json().catch(() => ({}));
+          throw new Error(payload.message || 'CSV export failed');
+        }
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'inspections_export.csv';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        setMessage(error.message, true);
+      } finally {
+        exportBtn.disabled = false;
+      }
+    }
+
+    filterForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      loadInspections();
+    });
+
+    clearBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      statusInput.value = '';
+      fromInput.value = '';
+      toInput.value = '';
+      loadInspections();
+    });
+
+    exportBtn.addEventListener('click', exportCsv);
+    logoutBtn.addEventListener('click', logout);
+    closeDialogBtn.addEventListener('click', () => detailDialog.close());
+
+    loadInspections();
+  </script>
+</body>
+</html>
