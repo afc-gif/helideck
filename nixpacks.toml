@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ["nodejs_20", "php83", "php83Packages.composer"]
+
+[phases.install]
+cmds = [
+  "npm install --omit=dev",
+  "cd backend && composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist"
+]
+
+[start]
+cmd = "bash start-railway.sh"

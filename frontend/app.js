@@ -1,7 +1,7 @@
 /* global idb */
 
 // Backend API configuration
-const API_BASE = "https://helideck-production.up.railway.app/api"; // Production API base (Railway)
+const API_BASE = 'https://helideck-production.up.railway.app/api';
 const FORM_VERSION = "rev15-2023-02-10";
 
 // Check authentication on page load

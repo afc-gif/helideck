@@ -329,7 +329,7 @@
   </div>
 
   <script>
-    const API_BASE = 'https://helideck-production.up.railway.app/api'; // Deployed Railway API
+    const API_BASE = 'https://helideck-production.up.railway.app/api';
     const DEMO_USER = {
       email: 'inspector@example.com',
       password: 'password',
@@ -371,6 +371,19 @@
       messageEl.classList.remove('show');
     }
 
+    async function readApiResponse(response, fallbackMessage) {
+      const contentType = response.headers.get('content-type') || '';
+
+      if (contentType.includes('application/json')) {
+        return response.json();
+      }
+
+      const text = await response.text();
+      return {
+        message: text.trim() || fallbackMessage
+      };
+    }
+
     function enterDemoMode() {
       localStorage.setItem('auth_token', 'demo-token');
       localStorage.setItem('auth_user', JSON.stringify({
@@ -407,7 +420,7 @@
           body: JSON.stringify({ email, password })
         });
 
-        const data = await response.json();
+        const data = await readApiResponse(response, 'Login failed');
 
         if (!response.ok) {
           throw new Error(data.message || 'Login failed');
@@ -424,7 +437,7 @@
           window.location.href = '/index.html';
         }, 1000);
       } catch (error) {
-        showMessage(`${error.message}. Use inspector@example.com / password for demo access.`, 'error');
+        showMessage(`${error.message}. Demo: inspector@example.com / password. Backend worker: inspector@example.com / InspectorPass123!.`, 'error');
       }
     });
 
@@ -450,7 +463,7 @@
           body: JSON.stringify({ name, email, password, password_confirmation: passwordConfirm })
         });
 
-        const data = await response.json();
+        const data = await readApiResponse(response, 'Registration failed');
 
         if (!response.ok) {
           throw new Error(data.message || 'Registration failed');

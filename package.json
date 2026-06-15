@@ -4,7 +4,7 @@
   "private": true,
   "description": "Offline-first helideck inspection reporting PWA.",
   "scripts": {
-    "start": "node server.js"
+    "start": "bash start-railway.sh"
   },
   "engines": {
     "node": ">=20"
