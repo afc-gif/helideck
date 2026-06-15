@@ -1,0 +1,11 @@
+.git
+.agents
+.codex
+
+backend/.env
+backend/vendor
+backend/node_modules
+
+node_modules
+npm-debug.log
+yarn-error.log
